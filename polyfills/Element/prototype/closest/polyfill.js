@@ -1,4 +1,4 @@
-Element.prototype.closest = function closest(selector) {
+Element.prototype.closest = Element.prototype.closest || function closest(selector) {
 	var node = this;
 
 	while (node) {
