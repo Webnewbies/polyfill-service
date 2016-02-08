@@ -1,49 +1,26 @@
 (function (global) {
+	var lastTime = Date.now();
+	global.cancelAnimationFrame = global.cancelAnimationFrame || global.mozCancelAnimationFrame || function(id){ clearTimeout(id); };
+	global.animationStartTime = global.animationStartTime || global.webkitAnimationStartTime || global.mozAnimationStartTime || global.oAnimationStartTime || global.msAnimationStartTime || +new Date();
+	global.requestAnimationFrame = global.requestAnimationFrame || global.mozRequestAnimationFrame || global.webkitRequestAnimationFrame || global.msRequestAnimationFrame || function (callback) {
+									if (typeof callback !== 'function') {
+										throw new TypeError(callback + 'is not a function');
+									}
 
-	if ('mozRequestAnimationFrame' in global) {
-		global.requestAnimationFrame = function (callback) {
-		    return mozRequestAnimationFrame(function () {
-		        callback(performance.now());
-		    });
-		};
-		global.cancelAnimationFrame = mozCancelAnimationFrame;
+									var
+									currentTime = Date.now(),
+									delay = 16 + lastTime - currentTime;
 
-	} else if ('webkitRequestAnimationFrame' in global) {
-		global.requestAnimationFrame = function (callback) {
-		    return webkitRequestAnimationFrame(function () {
-		        callback(performance.now());
-		    });
-		};
-		global.cancelAnimationFrame = webkitCancelAnimationFrame;
+									if (delay < 0) {
+										delay = 0;
+									}
 
-	} else {
+									lastTime = currentTime;
 
-		var lastTime = Date.now();
+									return setTimeout(function () {
+										lastTime = Date.now();
 
-		global.requestAnimationFrame = function (callback) {
-			if (typeof callback !== 'function') {
-				throw new TypeError(callback + 'is not a function');
-			}
-
-			var
-			currentTime = Date.now(),
-			delay = 16 + lastTime - currentTime;
-
-			if (delay < 0) {
-				delay = 0;
-			}
-
-			lastTime = currentTime;
-
-			return setTimeout(function () {
-				lastTime = Date.now();
-
-				callback(performance.now());
-			}, delay);
-		};
-
-		global.cancelAnimationFrame = function (id) {
-			clearTimeout(id);
-		};
-	}
-})(this);
+										callback(performance.now());
+									}, delay);
+								};
+		})(this);
